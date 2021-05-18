@@ -5,7 +5,7 @@ from . import base
 _KERAS_FRAMEWORK_NAME = 'keras'
 _TF_KERAS_FRAMEWORK_NAME = 'tf.keras'
 
-_DEFAULT_KERAS_FRAMEWORK = _KERAS_FRAMEWORK_NAME
+_DEFAULT_KERAS_FRAMEWORK = _TF_KERAS_FRAMEWORK_NAME
 _KERAS_FRAMEWORK = None
 _KERAS_BACKEND = None
 _KERAS_LAYERS = None
@@ -30,6 +30,7 @@ def inject_global_submodules(func):
         kwargs['layers'] = _KERAS_LAYERS
         kwargs['models'] = _KERAS_MODELS
         kwargs['utils'] = _KERAS_UTILS
+        print('kwargs',kwargs)
         return func(*args, **kwargs)
 
     return wrapper
@@ -123,11 +124,11 @@ get_available_backbone_names = Backbones.models_names
 def get_preprocessing(name):
     preprocess_input = Backbones.get_preprocessing(name)
     # add bakcend, models, layers, utils submodules in kwargs
-    preprocess_input = inject_global_submodules(preprocess_input)
+    #preprocess_input = inject_global_submodules(preprocess_input)
     # delete other kwargs
     # keras-applications preprocessing raise an error if something
     # except `backend`, `layers`, `models`, `utils` passed in kwargs
-    preprocess_input = filter_kwargs(preprocess_input)
+    #preprocess_input = filter_kwargs(preprocess_input)
     return preprocess_input
 
 
@@ -139,12 +140,16 @@ __all__ = [
     '__version__',
 ]
 
-import tensorflow.keras.applications as ka
 
 
-def get_submodules_from_kwargs(kwargs):
-    backend = kwargs.get('backend', ka._KERAS_BACKEND)
-    layers = kwargs.get('layers', ka._KERAS_LAYERS)
-    models = kwargs.get('models', ka._KERAS_MODELS)
-    utils = kwargs.get('utils', ka._KERAS_UTILS)
-    return backend, layers, models, utils
+
+from tensorflow import keras
+
+
+def get_submodules_from_kwargs():
+    backend = keras.backend
+    inp= keras
+    layers = keras.layers
+    models = keras
+    utils = keras.utils
+    return backend,inp, layers, models, utils
